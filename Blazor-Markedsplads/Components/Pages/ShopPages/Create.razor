@@ -1,0 +1,69 @@
+﻿@page "/shops/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Shop</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Shop" OnValidSubmit="AddShop" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="itemid" class="form-label">ItemId:</label> 
+                <InputNumber id="itemid" @bind-Value="Shop.ItemId" class="form-control" /> 
+                <ValidationMessage For="() => Shop.ItemId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label> 
+                <InputNumber id="price" @bind-Value="Shop.Price" class="form-control" /> 
+                <ValidationMessage For="() => Shop.Price" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity:</label> 
+                <InputNumber id="quantity" @bind-Value="Shop.Quantity" class="form-control" /> 
+                <ValidationMessage For="() => Shop.Quantity" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="available" class="form-label">Available:</label> 
+                <InputCheckbox id="available" @bind-Value="Shop.Available" class="form-check-input" /> 
+                <ValidationMessage For="() => Shop.Available" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/shops">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Shop Shop { get; set; } = new()
+    {
+        Item = new Item
+        {
+            ItemName = string.Empty,
+            ItemType = string.Empty,
+            Rarity = string.Empty,
+            ImageUrl = string.Empty,
+            Description = string.Empty
+        }
+    };
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddShop()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Shops.Add(Shop);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/shops");
+    }
+}

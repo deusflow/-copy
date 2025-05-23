@@ -1,0 +1,54 @@
+﻿@page "/trades/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Trade</h2>
+    <hr />
+    @if (trade is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">SellerId</dt>
+            <dd class="col-sm-10">@trade.SellerId</dd>
+            <dt class="col-sm-2">BuyerId</dt>
+            <dd class="col-sm-10">@trade.BuyerId</dd>
+            <dt class="col-sm-2">ItemId</dt>
+            <dd class="col-sm-10">@trade.ItemId</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@trade.Price</dd>
+            <dt class="col-sm-2">TradeDate</dt>
+            <dd class="col-sm-10">@trade.TradeDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/trades/edit?tradeid={trade.TradeId}")">Edit</a> |
+            <a href="@($"/trades")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Trade? trade;
+
+    [SupplyParameterFromQuery]
+    private int TradeId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        trade = await context.Trades.FirstOrDefaultAsync(m => m.TradeId == TradeId);
+
+        if (trade is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

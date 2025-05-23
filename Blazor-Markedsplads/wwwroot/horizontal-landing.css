@@ -1,0 +1,115 @@
+:root {
+    --page-count: 4;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('/assets/background.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.horizontal-pages {
+    width: calc(100% * var(--page-count));
+    height: 100vh;
+    display: flex;
+    transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.page {
+    width: 100vw;
+    height: 100vh;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition: all 0.5s ease;
+    padding: 20px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.page.active-page {
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.2) inset;
+}
+
+.page-home {
+    background: rgba(255, 255, 255, 0.9);
+}
+.page-shop {
+    background: rgba(252, 252, 252, 0.9);
+}
+.page-zone {
+    background: rgba(249, 249, 249, 0.9);
+}
+.page-about {
+    background: rgba(246, 246, 246, 0.9);
+}
+
+/*
+button.nav-btn {
+    position: fixed !important;
+    z-index: 9999 !important;
+    color: white !important;
+    background-color: transparent !important;
+    background-image: url('/assets/button_universal.svg') !important;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    border: none !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    padding: 0 !important;
+    text-align: center !important;
+    width: 236px !important;
+    height: 67px !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    transition: transform 0.2s !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5) !important;
+}
+
+button.nav-btn:hover {
+    transform: scale(1.05) !important;
+    filter: brightness(1.1) !important;
+}
+
+button.nav-btn.active {
+    filter: brightness(1.2) !important;
+    transform: scale(1.05) !important;
+}
+
+button.btn-home { top: 40px !important; left: 40px !important; }
+button.btn-shop { top: 40px !important; left: 280px !important; }
+button.btn-zone { top: 40px !important; left: 520px !important; }
+button.btn-about { top: 40px !important; left: 760px !important; }
+*/
+
+@media (max-width: 768px) {
+    /*
+    button.nav-btn {
+        width: 150px !important;
+        height: 50px !important;
+        font-size: 14px !important;
+    }
+    button.btn-home { top: 20px !important; left: 20px !important; }
+    button.btn-shop { top: 20px !important; left: 175px !important; }
+    button.btn-zone { top: 20px !important; left: 330px !important; }
+    button.btn-about { top: 20px !important; left: 485px !important; }
+    */
+}

@@ -1,0 +1,70 @@
+﻿@page "/inventories/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Inventory</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Inventory" OnValidSubmit="AddInventory" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserId:</label> 
+                <InputNumber id="userid" @bind-Value="Inventory.UserId" class="form-control" /> 
+                <ValidationMessage For="() => Inventory.UserId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="itemid" class="form-label">ItemId:</label> 
+                <InputNumber id="itemid" @bind-Value="Inventory.ItemId" class="form-control" /> 
+                <ValidationMessage For="() => Inventory.ItemId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity:</label> 
+                <InputNumber id="quantity" @bind-Value="Inventory.Quantity" class="form-control" /> 
+                <ValidationMessage For="() => Inventory.Quantity" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/inventories">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Inventory Inventory { get; set; } = new()
+    {
+        User = new User
+        {
+            Username = string.Empty,
+            Email = string.Empty,
+            PasswordHash = string.Empty
+        },
+        Item = new Item
+        {
+            ItemName = string.Empty,
+            ItemType = string.Empty,
+            Rarity = string.Empty,
+            ImageUrl = string.Empty,
+            Description = string.Empty
+        }
+    };
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddInventory()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Inventories.Add(Inventory);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/inventories");
+    }
+}

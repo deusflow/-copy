@@ -1,0 +1,81 @@
+﻿@page "/items/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Item</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Item" OnValidSubmit="AddItem" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="itemname" class="form-label">ItemName:</label> 
+                <InputText id="itemname" @bind-Value="Item.ItemName" class="form-control" /> 
+                <ValidationMessage For="() => Item.ItemName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="itemtype" class="form-label">ItemType:</label> 
+                <InputText id="itemtype" @bind-Value="Item.ItemType" class="form-control" /> 
+                <ValidationMessage For="() => Item.ItemType" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="rarity" class="form-label">Rarity:</label> 
+                <InputText id="rarity" @bind-Value="Item.Rarity" class="form-control" /> 
+                <ValidationMessage For="() => Item.Rarity" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="damagemin" class="form-label">DamageMin:</label> 
+                <InputNumber id="damagemin" @bind-Value="Item.DamageMin" class="form-control" /> 
+                <ValidationMessage For="() => Item.DamageMin" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="damagemax" class="form-label">DamageMax:</label> 
+                <InputNumber id="damagemax" @bind-Value="Item.DamageMax" class="form-control" /> 
+                <ValidationMessage For="() => Item.DamageMax" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="imageurl" class="form-label">ImageUrl:</label> 
+                <InputText id="imageurl" @bind-Value="Item.ImageUrl" class="form-control" /> 
+                <ValidationMessage For="() => Item.ImageUrl" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Item.Description" class="form-control" /> 
+                <ValidationMessage For="() => Item.Description" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/items">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Item Item { get; set; } = new()
+    {
+        ItemName = string.Empty,
+        ItemType = string.Empty,
+        Rarity = string.Empty,
+        ImageUrl = string.Empty,
+        Description = string.Empty
+    };
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Items.Add(Item);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/items");
+    }
+}

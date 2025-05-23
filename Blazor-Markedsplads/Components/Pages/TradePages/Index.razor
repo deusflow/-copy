@@ -1,0 +1,40 @@
+﻿@page "/trades"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorMarkedsplads.Models
+@using BlazorMarkedsplads
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="trades/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Trades">
+    <PropertyColumn Property="trade => trade.SellerId" />
+    <PropertyColumn Property="trade => trade.BuyerId" />
+    <PropertyColumn Property="trade => trade.ItemId" />
+    <PropertyColumn Property="trade => trade.Price" />
+    <PropertyColumn Property="trade => trade.TradeDate" />
+
+    <TemplateColumn Context="trade">
+        <a href="@($"trades/edit?tradeid={trade.TradeId}")">Edit</a> |
+        <a href="@($"trades/details?tradeid={trade.TradeId}")">Details</a> |
+        <a href="@($"trades/delete?tradeid={trade.TradeId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private OtakuMarketDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

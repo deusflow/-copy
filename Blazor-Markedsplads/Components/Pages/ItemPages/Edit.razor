@@ -1,0 +1,119 @@
+﻿@page "/items/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Item</h2>
+<hr />
+@if (Item is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Item" OnValidSubmit="UpdateItem" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Item.ItemId" value="@Item.ItemId" />
+                <div class="mb-3">
+                    <label for="itemname" class="form-label">ItemName:</label>
+                    <InputText id="itemname" @bind-Value="Item.ItemName" class="form-control" />
+                    <ValidationMessage For="() => Item.ItemName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="itemtype" class="form-label">ItemType:</label>
+                    <InputText id="itemtype" @bind-Value="Item.ItemType" class="form-control" />
+                    <ValidationMessage For="() => Item.ItemType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="rarity" class="form-label">Rarity:</label>
+                    <InputText id="rarity" @bind-Value="Item.Rarity" class="form-control" />
+                    <ValidationMessage For="() => Item.Rarity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="damagemin" class="form-label">DamageMin:</label>
+                    <InputNumber id="damagemin" @bind-Value="Item.DamageMin" class="form-control" />
+                    <ValidationMessage For="() => Item.DamageMin" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="damagemax" class="form-label">DamageMax:</label>
+                    <InputNumber id="damagemax" @bind-Value="Item.DamageMax" class="form-control" />
+                    <ValidationMessage For="() => Item.DamageMax" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="imageurl" class="form-label">ImageUrl:</label>
+                    <InputText id="imageurl" @bind-Value="Item.ImageUrl" class="form-control" />
+                    <ValidationMessage For="() => Item.ImageUrl" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Item.Description" class="form-control" />
+                    <ValidationMessage For="() => Item.Description" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/items">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int ItemId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Item? Item { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Item ??= await context.Items.FirstOrDefaultAsync(m => m.ItemId == ItemId);
+
+        if (Item is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Item!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ItemExists(Item!.ItemId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/items");
+    }
+
+    private bool ItemExists(int itemid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Items.Any(e => e.ItemId == itemid);
+    }
+}

@@ -1,0 +1,74 @@
+﻿@page "/trades/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Trade</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Trade" OnValidSubmit="AddTrade" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="sellerid" class="form-label">SellerId:</label> 
+                <InputNumber id="sellerid" @bind-Value="Trade.SellerId" class="form-control" /> 
+                <ValidationMessage For="() => Trade.SellerId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="buyerid" class="form-label">BuyerId:</label> 
+                <InputNumber id="buyerid" @bind-Value="Trade.BuyerId" class="form-control" /> 
+                <ValidationMessage For="() => Trade.BuyerId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="itemid" class="form-label">ItemId:</label> 
+                <InputNumber id="itemid" @bind-Value="Trade.ItemId" class="form-control" /> 
+                <ValidationMessage For="() => Trade.ItemId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label> 
+                <InputNumber id="price" @bind-Value="Trade.Price" class="form-control" /> 
+                <ValidationMessage For="() => Trade.Price" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="tradedate" class="form-label">TradeDate:</label> 
+                <InputDate id="tradedate" @bind-Value="Trade.TradeDate" class="form-control" /> 
+                <ValidationMessage For="() => Trade.TradeDate" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/trades">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Trade Trade { get; set; } = new()
+    {
+        Item = new Item
+        {
+            ItemName = string.Empty,
+            ItemType = string.Empty,
+            Rarity = string.Empty,
+            ImageUrl = string.Empty,
+            Description = string.Empty
+        }
+    };
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddTrade()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Trades.Add(Trade);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/trades");
+    }
+}

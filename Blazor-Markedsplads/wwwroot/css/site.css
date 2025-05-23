@@ -1,0 +1,261 @@
+/* Reset and base styles */
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Важно для предотвращения двойных скроллов */
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Arial', sans-serif;
+}
+/* Переменные для контроля размера фона на разных страницах */
+:root {
+    --bg-scale-home: 100%;
+    --bg-pos-x-home: center;
+    --bg-pos-y-home: center;
+    --bg-scale-shop: 100%;
+    --bg-pos-x-shop: center;
+    --bg-pos-y-shop: center;
+    --bg-scale-zone: 100%;
+    --bg-pos-x-zone: center;
+    --bg-pos-y-zone: center;
+    --bg-scale-about: 100%;
+    --bg-pos-x-about: center;
+    --bg-pos-y-about: center;
+    /* Переменные для огня на кнопках - можно настраивать для каждой кнопки отдельно */
+    --flame-size-home: 5vw;
+    --flame-pos-x-home: 50%; /* Пример: огонь по центру кнопки */
+    --flame-pos-y-home: -3vh;
+    --flame-size-shop: 5vw;
+    --flame-pos-x-shop: 50%;
+    --flame-pos-y-shop: -3vh;
+    --flame-size-zone: 5vw;
+    --flame-pos-x-zone: 50%;
+    --flame-pos-y-zone: -3vh;
+    --flame-size-about: 4vw;
+    --flame-pos-x-about: 50%;
+    --flame-pos-y-about: -4vh;
+}
+
+/* Horizontal scrolling container styles */
+.horizontal-pages {
+    width: calc(100% * var(--page-count));
+    height: 100vh;
+    display: flex;
+    transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+    transform: translateX(0);
+    will-change: transform;
+}
+
+/* Individual pages */
+.page {
+    width: 100vw;
+    height: 100vh;
+    flex-shrink: 0;
+    position: relative; /* Важно для позиционирования .background-image-wrapper и кнопок */
+    overflow: hidden; 
+}
+
+/* Контейнер для фонового SVG-изображения */
+.background-image-wrapper {
+    position: absolute;
+    top: 2.5%; /* Отступ сверху, (100% - 95%)/2 */
+    left: 2.5%; /* Отступ слева, (100% - 95%)/2 */
+    width: 95%;
+    height: 95%; 
+    display: flex; /* Для центрирования img внутри */
+    justify-content: center;
+    align-items: center;
+    z-index: 1; /* Под контентом и кнопками */
+    pointer-events: none; /* Сам wrapper не должен ловить события */
+    /* border: 1px dashed blue; */ /* Для отладки */
+}
+
+.background-svg-img {
+    display: block; /* Убирает лишние отступы под img */
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Масштабирует SVG, сохраняя пропорции, аналог background-size: contain */
+    object-position: center center; /* Центрирует SVG внутри <img>, аналог background-position: center */
+}
+
+/* Индивидуальные оверлеи для страниц (если нужны поверх основного фона) */
+.page-home::after, 
+.page-shop::after, 
+.page-zone::after, 
+.page-about::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 2; /* Над основным фоном, но под кнопками */
+    pointer-events: none;
+}
+
+/* Page content container (если есть контент на страницах кроме кнопок) */
+.page-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 3; /* Выше оверлеев, но ниже кнопок */
+}
+
+/* --- СТИЛИ ДЛЯ НАВИГАЦИОННЫХ КНОПОК --- */
+
+/* Базовые стили для ВСЕХ кнопок */
+.nav-btn {
+    position: absolute;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    pointer-events: auto;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Индивидуальные стили внешнего вида */
+.nav-btn-home,
+.nav-btn-shop,
+.nav-btn-zone {
+    background-image: url('../assets/button_universal.svg');
+    aspect-ratio: 200 / 70;
+    min-width: 150px;
+    font-size: 16px;
+}
+
+.nav-btn-about {
+    background-image: url('../assets/usersavatar.svg');
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    color: transparent;
+    text-shadow: none;
+    min-width: 50px;
+    opacity: 1;
+    filter: brightness(1);
+    transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hover эффекты */
+.nav-btn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+.nav-btn.active {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media (max-width: 768px) {
+    .nav-btn-home,
+    .nav-btn-shop,
+    .nav-btn-zone {
+        min-width: 120px;
+        font-size: 14px;
+    }
+    
+    .nav-btn-about {
+        min-width: 40px;
+    }
+}
+
+/* --- ЭФФЕКТЫ ДЛЯ КНОПОК --- */
+
+/* Общий стиль для огненной анимации - теперь только для активной секции */
+.page.active-page .nav-btn-home[id*="_s0"]::after,
+.page.active-page .nav-btn-shop[id*="_s1"]::after,
+.page.active-page .nav-btn-zone[id*="_s2"]::after,
+.page.active-page .nav-btn-about[id*="_s3"]::after {
+    content: "";
+    position: absolute;
+    background-image: url('../assets/fire-flame.gif');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
+    pointer-events: none;
+    z-index: -1;
+    left: var(--flame-pos-x-home);
+    top: var(--flame-pos-y-home);
+    width: var(--flame-size-home); 
+    height: var(--flame-size-home);
+    transform: translateX(-50%);
+}
+
+/* Специфичные настройки огня для кнопки About на её активной секции */
+.page.active-page .nav-btn-about[id*="_s3"]::after {
+    left: var(--flame-pos-x-about);
+    top: var(--flame-pos-y-about);
+    width: var(--flame-size-about);
+    height: var(--flame-size-about);
+}
+
+/* Если для кнопки About нужен другой размер/позиция огня, можно переопределить: */
+.nav-btn-about.active::after {
+    left: var(--flame-pos-x-about);
+    top: var(--flame-pos-y-about);
+    width: var(--flame-size-about);
+    height: var(--flame-size-about);
+}
+
+/* Специфичные стили для .nav-btn-about (если нужны при hover/active) */
+.nav-btn-about:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+.nav-btn-about.active {
+    /* Можно добавить специфичные эффекты для About, если стандартные не подходят */
+    box-shadow: 0 0 15px rgba(255,255,255,0.8); /* Пример из старых стилей */
+}
+
+/* Анимация для кнопки About при скролле */
+@keyframes fadeButton {
+    0% { 
+        opacity: 1; 
+        filter: brightness(1);
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.5; 
+        filter: brightness(0.7);
+        transform: scale(0.95);
+    }
+    100% { 
+        opacity: 1; 
+        filter: brightness(1);
+        transform: scale(1);
+    }
+}
+
+.nav-btn-about.scrolling {
+    animation: fadeButton 1.5s ease-in-out;
+    pointer-events: none;
+}
+
+/* Отключаем все другие transition эффекты во время анимации */
+.nav-btn-about.scrolling:hover {
+    transform: none;
+    filter: none;
+}
+
+/* ---- КОНЕЦ СТИЛЕЙ ДЛЯ НАВИГАЦИОННЫХ КНОПОК ---- */

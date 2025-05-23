@@ -1,0 +1,71 @@
+﻿@page "/trades/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Trade</h2>
+    <hr />
+    @if (trade is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">SellerId</dt>
+            <dd class="col-sm-10">@trade.SellerId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">BuyerId</dt>
+            <dd class="col-sm-10">@trade.BuyerId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ItemId</dt>
+            <dd class="col-sm-10">@trade.ItemId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@trade.Price</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TradeDate</dt>
+            <dd class="col-sm-10">@trade.TradeDate</dd>
+        </dl>
+        <EditForm method="post" Model="trade" OnValidSubmit="DeleteTrade" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(trade is null)">Delete</button> |
+            <a href="/trades">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Trade? trade;
+
+    [SupplyParameterFromQuery]
+    private int TradeId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        trade = await context.Trades.FirstOrDefaultAsync(m => m.TradeId == TradeId);
+
+        if (trade is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteTrade()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Trades.Remove(trade!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/trades");
+    }
+}

@@ -1,0 +1,39 @@
+﻿@page "/shops"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorMarkedsplads.Models
+@using BlazorMarkedsplads
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="shops/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Shops">
+    <PropertyColumn Property="shop => shop.ItemId" />
+    <PropertyColumn Property="shop => shop.Price" />
+    <PropertyColumn Property="shop => shop.Quantity" />
+    <PropertyColumn Property="shop => shop.Available" />
+
+    <TemplateColumn Context="shop">
+        <a href="@($"shops/edit?shopitemid={shop.ShopItemId}")">Edit</a> |
+        <a href="@($"shops/details?shopitemid={shop.ShopItemId}")">Details</a> |
+        <a href="@($"shops/delete?shopitemid={shop.ShopItemId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private OtakuMarketDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

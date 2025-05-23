@@ -1,0 +1,99 @@
+﻿@page "/inventories/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Inventory</h2>
+<hr />
+@if (Inventory is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Inventory" OnValidSubmit="UpdateInventory" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Inventory.InventoryId" value="@Inventory.InventoryId" />
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserId:</label>
+                    <InputNumber id="userid" @bind-Value="Inventory.UserId" class="form-control" />
+                    <ValidationMessage For="() => Inventory.UserId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="itemid" class="form-label">ItemId:</label>
+                    <InputNumber id="itemid" @bind-Value="Inventory.ItemId" class="form-control" />
+                    <ValidationMessage For="() => Inventory.ItemId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <InputNumber id="quantity" @bind-Value="Inventory.Quantity" class="form-control" />
+                    <ValidationMessage For="() => Inventory.Quantity" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/inventories">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int InventoryId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Inventory? Inventory { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Inventory ??= await context.Inventories.FirstOrDefaultAsync(m => m.InventoryId == InventoryId);
+
+        if (Inventory is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateInventory()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Inventory!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!InventoryExists(Inventory!.InventoryId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/inventories");
+    }
+
+    private bool InventoryExists(int inventoryid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Inventories.Any(e => e.InventoryId == inventoryid);
+    }
+}

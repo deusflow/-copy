@@ -1,0 +1,50 @@
+﻿@page "/inventories/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Inventory</h2>
+    <hr />
+    @if (inventory is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@inventory.UserId</dd>
+            <dt class="col-sm-2">ItemId</dt>
+            <dd class="col-sm-10">@inventory.ItemId</dd>
+            <dt class="col-sm-2">Quantity</dt>
+            <dd class="col-sm-10">@inventory.Quantity</dd>
+        </dl>
+        <div>
+            <a href="@($"/inventories/edit?inventoryid={inventory.InventoryId}")">Edit</a> |
+            <a href="@($"/inventories")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Inventory? inventory;
+
+    [SupplyParameterFromQuery]
+    private int InventoryId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        inventory = await context.Inventories.FirstOrDefaultAsync(m => m.InventoryId == InventoryId);
+
+        if (inventory is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

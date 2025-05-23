@@ -1,0 +1,52 @@
+﻿@page "/shops/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Shop</h2>
+    <hr />
+    @if (shop is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ItemId</dt>
+            <dd class="col-sm-10">@shop.ItemId</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@shop.Price</dd>
+            <dt class="col-sm-2">Quantity</dt>
+            <dd class="col-sm-10">@shop.Quantity</dd>
+            <dt class="col-sm-2">Available</dt>
+            <dd class="col-sm-10">@shop.Available</dd>
+        </dl>
+        <div>
+            <a href="@($"/shops/edit?shopitemid={shop.ShopItemId}")">Edit</a> |
+            <a href="@($"/shops")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Shop? shop;
+
+    [SupplyParameterFromQuery]
+    private int ShopItemId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        shop = await context.Shops.FirstOrDefaultAsync(m => m.ShopItemId == ShopItemId);
+
+        if (shop is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

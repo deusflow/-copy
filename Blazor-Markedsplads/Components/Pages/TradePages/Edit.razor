@@ -1,0 +1,109 @@
+﻿@page "/trades/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Trade</h2>
+<hr />
+@if (Trade is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Trade" OnValidSubmit="UpdateTrade" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Trade.TradeId" value="@Trade.TradeId" />
+                <div class="mb-3">
+                    <label for="sellerid" class="form-label">SellerId:</label>
+                    <InputNumber id="sellerid" @bind-Value="Trade.SellerId" class="form-control" />
+                    <ValidationMessage For="() => Trade.SellerId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="buyerid" class="form-label">BuyerId:</label>
+                    <InputNumber id="buyerid" @bind-Value="Trade.BuyerId" class="form-control" />
+                    <ValidationMessage For="() => Trade.BuyerId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="itemid" class="form-label">ItemId:</label>
+                    <InputNumber id="itemid" @bind-Value="Trade.ItemId" class="form-control" />
+                    <ValidationMessage For="() => Trade.ItemId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber id="price" @bind-Value="Trade.Price" class="form-control" />
+                    <ValidationMessage For="() => Trade.Price" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="tradedate" class="form-label">TradeDate:</label>
+                    <InputDate id="tradedate" @bind-Value="Trade.TradeDate" class="form-control" />
+                    <ValidationMessage For="() => Trade.TradeDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/trades">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int TradeId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Trade? Trade { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Trade ??= await context.Trades.FirstOrDefaultAsync(m => m.TradeId == TradeId);
+
+        if (Trade is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateTrade()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Trade!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TradeExists(Trade!.TradeId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/trades");
+    }
+
+    private bool TradeExists(int tradeid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Trades.Any(e => e.TradeId == tradeid);
+    }
+}

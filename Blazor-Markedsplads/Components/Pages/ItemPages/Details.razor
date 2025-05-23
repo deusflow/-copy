@@ -1,0 +1,58 @@
+﻿@page "/items/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorMarkedsplads.Models
+@inject IDbContextFactory<BlazorMarkedsplads.OtakuMarketDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Item</h2>
+    <hr />
+    @if (item is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ItemName</dt>
+            <dd class="col-sm-10">@item.ItemName</dd>
+            <dt class="col-sm-2">ItemType</dt>
+            <dd class="col-sm-10">@item.ItemType</dd>
+            <dt class="col-sm-2">Rarity</dt>
+            <dd class="col-sm-10">@item.Rarity</dd>
+            <dt class="col-sm-2">DamageMin</dt>
+            <dd class="col-sm-10">@item.DamageMin</dd>
+            <dt class="col-sm-2">DamageMax</dt>
+            <dd class="col-sm-10">@item.DamageMax</dd>
+            <dt class="col-sm-2">ImageUrl</dt>
+            <dd class="col-sm-10">@item.ImageUrl</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@item.Description</dd>
+        </dl>
+        <div>
+            <a href="@($"/items/edit?itemid={item.ItemId}")">Edit</a> |
+            <a href="@($"/items")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Item? item;
+
+    [SupplyParameterFromQuery]
+    private int ItemId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        item = await context.Items.FirstOrDefaultAsync(m => m.ItemId == ItemId);
+
+        if (item is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
